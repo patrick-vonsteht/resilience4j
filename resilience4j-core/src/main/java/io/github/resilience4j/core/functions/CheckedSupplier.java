@@ -32,4 +32,17 @@ public interface CheckedSupplier<T> {
         Objects.requireNonNull(after, "after is null");
         return () -> after.apply(get());
     }
+    default Supplier<T> unchecked() {
+        return () -> {
+            try {
+                return get();
+            } catch(Throwable t) {
+                return sneakyThrow(t);
+            }
+        };
+    }
+
+    static <T extends Throwable, R> R sneakyThrow(Throwable t) throws T {
+        throw (T) t;
+    }
 }

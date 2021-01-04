@@ -24,4 +24,18 @@ package io.github.resilience4j.core.functions;
 @FunctionalInterface
 public interface CheckedRunnable {
     void run() throws Throwable;
+
+    default Runnable unchecked() {
+        return () -> {
+            try {
+                run();
+            } catch(Throwable x) {
+                sneakyThrow(x);
+            }
+        };
+    }
+
+    static <T extends Throwable, R> R sneakyThrow(Throwable t) throws T {
+        throw (T) t;
+    }
 }
